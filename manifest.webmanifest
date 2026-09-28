@@ -1,0 +1,10 @@
+{
+  "name":"HR Management System",
+  "short_name":"HR System",
+  "start_url":"./HR_Software_HTML_DESKTOP_MONTHLY_ALL_CLOUD.html",
+  "display":"standalone",
+  "background_color":"#ffffff",
+  "theme_color":"#1b6ca8",
+  "description":"HR Management System with Cloud Database",
+  "icons":[]
+}
