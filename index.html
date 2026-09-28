@@ -16,7 +16,6 @@ label{font-weight:bold;font-size:13px;display:block;margin-bottom:5px}input,sele
 table{width:100%;border-collapse:collapse;background:#fff}th,td{border:1px solid #dce2e8;padding:7px;font-size:13px;text-align:left}th{background:#eaf0f6}
 .stat{font-size:28px;font-weight:bold}.muted{color:#667}
 .notice{padding:10px;background:#fff6d8;border-left:4px solid #e0a800;margin-bottom:12px}
-.emp-photo-box{display:flex;align-items:center;gap:14px;padding:10px;border:1px dashed #b8c4d0;border-radius:8px;background:#f8fafc}.emp-photo-preview{width:110px;height:110px;border-radius:8px;object-fit:cover;border:1px solid #ccd5df;background:#eef2f6}.profile-photo{width:150px;height:150px;border-radius:10px;object-fit:cover;border:1px solid #ccd5df;background:#eef2f6;cursor:pointer}
 
 @media print{nav,header,.no-print{display:none!important}main{padding:0}.page{display:none}.page.printable{display:block}.card{box-shadow:none}}
 
@@ -26,43 +25,36 @@ table{width:100%;border-collapse:collapse;background:#fff}th,td{border:1px solid
 #lightboxImg{max-width:95vw;max-height:90vh;object-fit:contain;border-radius:8px;box-shadow:0 4px 30px #000}
 #lightboxClose{position:absolute;top:12px;right:18px;color:#fff;font-size:36px;cursor:pointer;line-height:1}
 
+
+.auth-overlay{position:fixed;inset:0;z-index:100000;background:linear-gradient(135deg,#102f52,#1b6ca8);display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-card{width:min(430px,94vw);background:#fff;border-radius:14px;padding:28px;box-shadow:0 12px 45px #0005}.auth-card h1{margin:0 0 5px;color:#123b68}.auth-sub{margin:0 0 18px;color:#667}.auth-status{background:#eef5fb;border-left:4px solid #1b6ca8;padding:10px;margin-bottom:15px;min-height:42px}.auth-note{font-size:12px;color:#667;margin-top:12px;line-height:1.5}.auth-btn{width:100%;font-size:16px;padding:12px}.app-shell{display:none}.app-shell.ready{display:block}.user-chip{margin-left:10px;font-size:12px}.sync-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#999;margin-right:5px}.sync-dot.ok{background:#218838}.sync-dot.busy{background:#e0a800}
 html,body{min-width:1280px}
 body{overflow-x:auto}
 .wrap{min-width:1280px}
 nav{width:220px;flex:0 0 220px}
 main{min-width:1060px}
-
-#cloudModal{display:none;position:fixed;z-index:10000;inset:0;background:rgba(0,0,0,.65);align-items:center;justify-content:center;padding:20px}
-#cloudModal.show{display:flex}.cloud-box{background:#fff;width:760px;max-width:95vw;border-radius:12px;padding:20px;box-shadow:0 8px 40px #0005}.cloud-box h2{margin-top:0}.cloud-status{font-size:13px;padding:8px 10px;border-radius:6px;background:#eef4f8;margin:8px 0}.cloud-status.ok{background:#e8f5e9}.cloud-status.err{background:#ffebee}
 </style>
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1b6ca8"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="HR Management System"></head>
+</head>
 <body>
-<header><h1>HR Management System — Desktop Mode</h1><div style="display:flex;align-items:center;gap:10px"><span id="cloudStatus" style="font-size:13px">☁ Local Data</span><button class="btn" style="background:#fff;color:#123b68;margin:0" onclick="openCloudModal()">☁ Cloud Sync</button><span id="clock"></span></div></header>
-<div id="cloudModal">
-  <div class="cloud-box">
-    <h2>☁ Shared Cloud Database</h2>
-    <div class="notice">এই সেটিং একবার করে নিলে একই Cloud Database-এ সব মোবাইলের HR data থাকবে। অন্য মোবাইলে একই <b>Share Link</b> খুললে একই data load হবে।</div>
-    <div class="grid">
-      <div><label>Supabase Project URL</label><input id="cloudUrl" placeholder="https://xxxxxxxx.supabase.co"></div>
-      <div><label>Supabase Anon / Publishable Key</label><input id="cloudKey" placeholder="eyJ..." type="password"></div>
-    </div>
-    <div id="cloudModalStatus" class="cloud-status">Cloud not connected.</div>
-    <div>
-      <button class="btn green" onclick="connectCloud()">Connect / Test</button>
-      <button class="btn" onclick="downloadCloud()">⬇ Download Cloud Data</button>
-      <button class="btn" onclick="uploadCloud()">⬆ Upload This Device Data</button>
-      <button class="btn" onclick="copyCloudShareLink()">🔗 Copy Share Link</button>
-      <button class="btn gray" onclick="closeCloudModal()">Close</button>
-    </div>
-    <p class="muted" style="margin-bottom:0">প্রথমবার: Supabase table/policies তৈরি করে এই ডিভাইসের data <b>Upload</b> করুন। এরপর অন্য মোবাইলে Share Link খুললে Cloud data পাওয়া যাবে।</p>
+<div id="authOverlay" class="auth-overlay">
+  <div class="auth-card">
+    <h1>🔐 HR Management System</h1>
+    <p class="auth-sub">Secure Login — Supabase Cloud</p>
+    <div class="auth-status" id="authStatus">Please sign in to continue.</div>
+    <label>Email</label>
+    <input id="loginEmail" type="email" autocomplete="username" placeholder="Enter your email">
+    <label>Password</label>
+    <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter your password" onkeydown="if(event.key==='Enter')signIn()">
+    <button class="btn green auth-btn" onclick="signIn()">🔓 Sign In</button>
+    <div class="auth-note">Your HR data is loaded from your own Supabase account. Never put a Supabase Secret/Service Role key in this file.</div>
   </div>
 </div>
+<div id="appShell" class="app-shell">
+<header><h1>HR Management System — Desktop Mode</h1><div><span id="clock"></span><span class="user-chip" id="userChip"></span><span class="user-chip" id="syncState">☁ Not connected</span><button class="btn gray" onclick="cloudSyncNow()">☁ Sync</button><button class="btn red" onclick="signOut()">Logout</button></div></header>
 <div class="wrap">
 <nav>
 <button onclick="show('dashboard')">🏠 Dashboard</button>
 <button onclick="show('employees')">👤 Employees</button>
-<button onclick="show('incharge');renderEmployeeTypePage('In-Charge')">👔 In-Charge File</button>
-<button onclick="show('filler');renderEmployeeTypePage('Filler')">⛽ Filler File</button>
 <button onclick="show('monthlyAttendance')">📅 Monthly Attendance</button>
 <button onclick="show('locations')">📍 Locations</button>
 <button onclick="show('leave')">🌴 Leave</button>
@@ -72,6 +64,7 @@ main{min-width:1060px}
 <button onclick="show('reports')">📊 Reports</button>
 <button onclick="backup()">⬇ Backup Data</button>
 <button onclick="document.getElementById('restore').click()">⬆ Restore Data</button>
+<div class="notice" style="font-size:11px;background:#163d65;color:#fff;border-left-color:#65a9df;margin-top:10px">🔐 Cloud data is protected by Supabase Auth + RLS.</div>
 <input id="restore" type="file" accept=".json" style="display:none" onchange="restore(event)">
 </nav>
 <main>
@@ -106,10 +99,9 @@ main{min-width:1060px}
 <div><label>Full Name *</label><input id="eName"></div>
 <div><label>Visa Company</label><input id="eVisa"></div>
 <div><label>Division</label><input id="eDivision"></div>
-<div><label>Designation</label><input id="eDesignation" list="designationOptions" placeholder="e.g. In-Charge / Filler / Petrol Salesman"><datalist id="designationOptions"><option value="In-Charge"></option><option value="Filler"></option><option value="Petrol Salesman"></option><option value="Supervisor"></option></datalist></div>
+<div><label>Designation</label><input id="eDesignation"></div>
 <div><label>Department</label><input id="eDepartment"></div>
 <div><label>Category</label><input id="eCategory"></div>
-<div><label>Employee Type</label><select id="eType" onchange="syncEmployeeTypeDesignation()"><option value="Filler">Filler</option><option value="In-Charge">In-Charge</option><option value="Other">Other</option></select></div>
 <div><label>Grade</label><input id="eGrade"></div>
 <div><label>Nationality</label><input id="eNationality"></div>
 <div><label>Gender</label><select id="eGender"><option>Male</option><option>Female</option></select></div>
@@ -120,20 +112,11 @@ main{min-width:1060px}
 <div><label>Status</label><select id="eStatus"><option>Active</option><option>Inactive</option><option>On Leave</option></select></div>
 <div><label>Phone</label><input id="ePhone"></div>
 <div><label>Email</label><input id="eEmail"></div>
-<div style="grid-column:1/-1"><label>Employee Photo</label><input type="hidden" id="ePhotoData"><div class="emp-photo-box"><img id="ePhotoPreview" class="emp-photo-preview" src="" alt="Employee Photo"><div style="flex:1"><input id="ePhoto" type="file" accept="image/*" onchange="previewEmployeePhoto(this)"><div class="muted" style="margin-top:6px">JPG/PNG/WebP. The photo is resized automatically for cloud storage.</div><button type="button" class="btn gray" onclick="clearEmployeePhoto()">Remove Photo</button></div></div></div>
 </div>
 <button class="btn green" onclick="saveEmployee()">Save Employee</button><button class="btn" onclick="saveEmployee()">Save & Add Another</button>
 <button class="btn gray" onclick="clearEmployee()">New / Clear</button>
 </div>
 <div class="card"><h3>Employee List</h3><div class="muted">You can add unlimited employees. Only the complete Employee ID must be unique; ASG-316, OIC-316 and ALF-316 are separate IDs.</div><div style="overflow:auto"><table><thead><tr><th>ID</th><th>Name</th><th>Company</th><th>Designation</th><th>Department</th><th>Location</th><th>Status</th><th>Action</th></tr></thead><tbody id="empTable"></tbody></table></div></div>
-</section>
-
-<section id="incharge" class="page">
-<div class="card"><h2>👔 In-Charge Employees — Separate File</h2><div class="notice">এই ফাইলে শুধু Employee Type = In-Charge কর্মীরা দেখাবে। এখান থেকে Edit/Print করা যাবে।</div><button class="btn" onclick="renderEmployeeTypePage('In-Charge');window.print()">Print In-Charge</button><div style="overflow:auto"><table><thead><tr><th>ID</th><th>Name</th><th>Designation</th><th>Department</th><th>Location</th><th>Status</th><th>Action</th></tr></thead><tbody id="inchargeBody"></tbody></table></div></div>
-</section>
-
-<section id="filler" class="page">
-<div class="card"><h2>⛽ Filler Employees — Separate File</h2><div class="notice">এই ফাইলে শুধু Employee Type = Filler কর্মীরা দেখাবে। এখান থেকে Edit/Print করা যাবে।</div><button class="btn" onclick="renderEmployeeTypePage('Filler');window.print()">Print Filler</button><div style="overflow:auto"><table><thead><tr><th>ID</th><th>Name</th><th>Designation</th><th>Department</th><th>Location</th><th>Status</th><th>Action</th></tr></thead><tbody id="fillerBody"></tbody></table></div></div>
 </section>
 
 <section id="monthlyAttendance" class="page">
@@ -160,8 +143,7 @@ main{min-width:1060px}
 <button class="btn gray" onclick="renderLocations()">Refresh Locations</button>
 </div>
 <div class="card"><h3>All Locations & Employees</h3><div style="overflow:auto"><table><thead><tr><th>Location</th><th>Current Employees</th><th>Employee IDs</th><th>Employee Names</th><th>Action</th></tr></thead><tbody id="locationTable"></tbody></table></div></div>
-<div class="card"><h3>📍 Location Complete Details</h3><div class="grid"><div><label>Select Location</label><select id="locationDetailSelect" onchange="renderLocationOverview()"><option value="">Select Location</option></select></div><div><label>Month</label><select id="locationDetailMonth" class="month-select" onchange="renderLocationOverview()"></select><div id="locationDetailMonthText" class="muted" style="margin-top:4px"></div></div></div><div class="notice">Select a location to see all current employees together. Attendance, OT, Leave and Salary are shown for the selected month. Old records remain under their original location.</div><div style="overflow:auto"><table><thead><tr><th>Employee ID</th><th>Employee Name</th><th>Department</th><th>Attendance</th><th>OT Hours</th><th>Leave Days</th><th>Basic</th><th>Allowances</th><th>Incentives</th><th>OT Amount</th><th>Deduction</th><th>Net Salary</th><th>Memos</th></tr></thead><tbody id="locationOverviewTable"></tbody></table></div></div>
-<div class="card"><h3>Location-wise Salary History</h3><div class="notice">Every saved payroll record keeps the location that was active when the payroll was saved.</div><div style="overflow:auto"><table><thead><tr><th>Location</th><th>Month</th><th>Employee ID</th><th>Employee Name</th><th>Basic</th><th>Allowances</th><th>V-Power</th><th>Fuel</th><th>Filling Station</th><th>Telephone</th><th>OT</th><th>Deduction</th><th>Net Salary</th></tr></thead><tbody id="locationSalaryTable"></tbody></table></div></div>
+<div class="card"><h3>Location-wise Salary Details</h3><div class="notice">প্রতিটি Location-এর অধীনে Employee Name, Employee ID এবং Month অনুযায়ী Salary Details এখানে দেখা যাবে। Employee Location change করলে পুরোনো payroll-এর saved Location অনুযায়ী history থাকবে।</div><div style="overflow:auto"><table><thead><tr><th>Location</th><th>Month</th><th>Employee ID</th><th>Employee Name</th><th>Basic</th><th>Allowances</th><th>V-Power</th><th>Fuel</th><th>Filling Station</th><th>Telephone</th><th>OT</th><th>Deduction</th><th>Net Salary</th></tr></thead><tbody id="locationSalaryTable"></tbody></table></div></div>
 </section>
 
 <section id="leave" class="page">
@@ -239,50 +221,124 @@ main{min-width:1060px}
 </section>
 
 </main></div>
+</div>
 
 <div id="imageLightbox" onclick="closeMemoImage(event)">
   <span id="lightboxClose" onclick="closeMemoImage(event)">&times;</span>
   <img id="lightboxImg" src="" alt="Memo Image" onclick="event.stopPropagation()">
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+// ================= SUPABASE AUTH + CLOUD CONFIG =================
+const SUPABASE_URL = 'https://pxfcrovaikcawhfbqkpd.supabase.co';
+// Paste ONLY your Supabase Publishable (or legacy anon) key below. Never use a Secret/Service Role key.
+const SUPABASE_PUBLISHABLE_KEY = 'PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE';
+const supabaseClient = (SUPABASE_PUBLISHABLE_KEY && !SUPABASE_PUBLISHABLE_KEY.includes('PASTE_YOUR'))
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
+const SESSION_DATA_KEY='HR_SESSION_DATA_V2';
+const OLD_LOCAL_KEY='HR_HTML_SYSTEM_V1';
+let currentSession=null;
+let cloudSyncTimer=null;
+let cloudBusy=false;
+let db={employees:[],attendance:[],monthlyAttendance:[],leave:[],salary:[],memos:[],locations:[]};
+
+function emptyDb(){return {employees:[],attendance:[],monthlyAttendance:[],leave:[],salary:[],memos:[],locations:[]};}
+function setAuthStatus(msg,error=false){const el=document.getElementById('authStatus');if(el){el.textContent=msg;el.style.borderLeftColor=error?'#c62828':'#1b6ca8';el.style.background=error?'#fff0f0':'#eef5fb';}}
+function setSyncState(state,msg){const el=document.getElementById('syncState');if(el)el.textContent=msg||state;}
+function showApp(){document.getElementById('authOverlay').style.display='none';document.getElementById('appShell').classList.add('ready');}
+function showLogin(msg){document.getElementById('appShell').classList.remove('ready');document.getElementById('authOverlay').style.display='flex';if(msg)setAuthStatus(msg);}
+function loadDbIntoMemory(x){db=x&&typeof x==='object'?x:emptyDb();db.employees=Array.isArray(db.employees)?db.employees:[];db.attendance=Array.isArray(db.attendance)?db.attendance:[];db.monthlyAttendance=Array.isArray(db.monthlyAttendance)?db.monthlyAttendance:[];db.leave=Array.isArray(db.leave)?db.leave:[];db.salary=Array.isArray(db.salary)?db.salary:[];db.memos=Array.isArray(db.memos)?db.memos:[];db.locations=Array.isArray(db.locations)?db.locations:[];}
+function sessionSave(){try{sessionStorage.setItem(SESSION_DATA_KEY,JSON.stringify(db));}catch(e){console.warn('Session cache unavailable',e);}}
+function normalizeDb(){db.locations=Array.isArray(db.locations)?db.locations:[];db.monthlyAttendance=db.monthlyAttendance||[];if(!db.memos)db.memos=[];db.employees.forEach(e=>{if(!Array.isArray(e.locationHistory)){e.locationHistory=e.location?[{location:e.location,from:e.join||'',to:''}]:[];}});syncLocationMaster();repairMonthlyAndSalary();}
+
+async function signIn(){
+  if(!supabaseClient){setAuthStatus('Please paste your Supabase Publishable key into SUPABASE_PUBLISHABLE_KEY first.',true);return;}
+  const email=document.getElementById('loginEmail').value.trim();const password=document.getElementById('loginPassword').value;
+  if(!email||!password){setAuthStatus('Email and password are required.',true);return;}
+  setAuthStatus('Signing in...');
+  try{
+    const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+    if(error)throw error;
+    currentSession=data.session;
+    await loadCloudAfterLogin(true);
+  }catch(e){console.error(e);setAuthStatus(e.message||'Login failed.',true);}
+}
+
+async function loadCloudAfterLogin(allowMigration){
+  if(!currentSession)return;
+  showApp();
+  document.getElementById('userChip').textContent='👤 '+(currentSession.user.email||'Signed in');
+  try{
+    setAuthStatus('');setSyncState('busy','☁ Loading cloud...');
+    const {data,error}=await supabaseClient.from('hr_data').select('key,data,updated_at').eq('key','main').maybeSingle();
+    if(error)throw error;
+    if(data&&data.data){
+      loadDbIntoMemory(data.data);normalizeDb();sessionSave();refresh();clearEmployee();clearMemo();
+      setSyncState('ok','☁ Cloud loaded');
+    }else{
+      let old=null;try{old=JSON.parse(localStorage.getItem(OLD_LOCAL_KEY)||'null');}catch(e){}
+      if(allowMigration&&old&&old.employees&&confirm('No cloud data was found for this account. Upload the existing HR data from this browser to your new cloud account?')){
+        loadDbIntoMemory(old);normalizeDb();sessionSave();await uploadCloud(true);
+      }else{
+        loadDbIntoMemory(emptyDb());normalizeDb();sessionSave();refresh();clearEmployee();clearMemo();setSyncState('ok','☁ New cloud account');
+      }
+    }
+  }catch(e){console.error(e);setSyncState('busy','Cloud error');alert('Cloud data could not be loaded. Check Supabase URL, Publishable key, Auth user and RLS.\n\n'+(e.message||e));}
+}
+
+async function uploadCloud(silent=false){
+  if(!currentSession)return false;
+  if(!supabaseClient)return false;
+  cloudBusy=true;setSyncState('busy','☁ Saving...');
+  try{
+    const payload={key:'main',user_id:currentSession.user.id,data:db,updated_at:new Date().toISOString()};
+    const {error}=await supabaseClient.from('hr_data').upsert(payload,{onConflict:'key,user_id'});
+    if(error)throw error;
+    sessionSave();setSyncState('ok','☁ Synced');
+    if(!silent)alert('Cloud sync completed successfully.');
+    return true;
+  }catch(e){console.error(e);setSyncState('busy','Cloud save failed');if(!silent)alert('Cloud save failed.\n\n'+(e.message||e));return false;}
+  finally{cloudBusy=false;}
+}
+function queueCloudSync(){if(!currentSession)return;clearTimeout(cloudSyncTimer);cloudSyncTimer=setTimeout(()=>uploadCloud(true),900);}
+async function cloudSyncNow(){await uploadCloud(false);}
+async function signOut(){
+  if(!confirm('Logout from HR Management System?'))return;
+  try{if(supabaseClient)await supabaseClient.auth.signOut();}catch(e){console.error(e);}
+  clearTimeout(cloudSyncTimer);currentSession=null;loadDbIntoMemory(emptyDb());try{sessionStorage.removeItem(SESSION_DATA_KEY);}catch(e){}
+  document.getElementById('userChip').textContent='';showLogin('You have been logged out.');
+}
+
+async function initAuth(){
+  if(!supabaseClient){showLogin('Configuration required: paste your Supabase Publishable key into the HTML file.');return;}
+  try{
+    const {data}=await supabaseClient.auth.getSession();
+    if(data.session){currentSession=data.session;await loadCloudAfterLogin(false);}else{showLogin('Please sign in to continue.');}
+    supabaseClient.auth.onAuthStateChange(async(event,session)=>{
+      if(event==='TOKEN_REFRESHED'&&session){currentSession=session;}
+      if(event==='SIGNED_OUT'){currentSession=null;showLogin('You have been logged out.');}
+    });
+  }catch(e){console.error(e);showLogin('Unable to initialize login: '+(e.message||e));}
+}
+
 const KEY='HR_HTML_SYSTEM_V1';
-const CLOUD_KEY='HR_HTML_CLOUD_CONFIG_V1';
-let db=JSON.parse(localStorage.getItem(KEY)||'null')||{employees:[],attendance:[],monthlyAttendance:[],leave:[],salary:[],memos:[],locations:[]};
-let cloudSaving=false, cloudLoading=false, cloudSaveTimer=null;
-function getCloudConfig(){try{return JSON.parse(localStorage.getItem(CLOUD_KEY)||'null')||{}}catch(e){return {}}}
-function setCloudConfig(c){localStorage.setItem(CLOUD_KEY,JSON.stringify(c||{}));}
-function cloudConfigured(){const c=getCloudConfig();return !!(c.url&&c.key)}
-function cloudUrl(){return String(getCloudConfig().url||'').replace(/\/$/,'')}
-function cloudHeaders(){const c=getCloudConfig();return {'apikey':c.key,'Authorization':'Bearer '+c.key,'Content-Type':'application/json','Accept':'application/json'}}
-function setCloudStatus(msg,ok=false){const a=document.getElementById('cloudStatus'),b=document.getElementById('cloudModalStatus');if(a)a.textContent=cloudConfigured()?'☁ '+msg:'☁ Local Data';if(b){b.textContent=msg;b.className='cloud-status '+(ok?'ok':'err')}}
-function openCloudModal(){const c=getCloudConfig();document.getElementById('cloudUrl').value=c.url||'';document.getElementById('cloudKey').value=c.key||'';setCloudStatus(cloudConfigured()?'Cloud configured.':'Cloud not connected.',cloudConfigured());document.getElementById('cloudModal').classList.add('show')}
-function closeCloudModal(){document.getElementById('cloudModal').classList.remove('show')}
-async function cloudRequest(method,body){const res=await fetch(cloudUrl()+'/rest/v1/hr_data?key=eq.main',{method,headers:{...cloudHeaders(),...(method==='POST'?{'Prefer':'resolution=merge-duplicates,return=representation'}:{})},body:body?JSON.stringify(body):undefined});const text=await res.text();if(!res.ok)throw new Error(text||('HTTP '+res.status));return text?JSON.parse(text):[]}
-async function connectCloud(){const url=document.getElementById('cloudUrl').value.trim().replace(/\/$/,'');const key=document.getElementById('cloudKey').value.trim();if(!url||!key)return alert('Supabase Project URL and Anon/Publishable Key are required.');setCloudConfig({url,key});try{await cloudRequest('GET');setCloudStatus('Connected to cloud database.',true);alert('Cloud connection successful. Now use Upload This Device Data for the first upload.');}catch(e){setCloudStatus('Connection failed: '+e.message,false);alert('Cloud connection failed. Check URL, key, table and RLS policies.\n\n'+e.message)}}
-async function downloadCloud(silent=false){if(!cloudConfigured()){if(!silent)alert('First configure Cloud Sync.');return false}try{cloudLoading=true;const rows=await cloudRequest('GET');if(!rows.length){setCloudStatus('Cloud database is empty.',true);if(!silent)alert('Cloud database is empty. Upload this device data first.');return false}const remote=rows[0].data;if(!remote||!remote.employees)throw new Error('Cloud data format is invalid.');db=remote;db.locations=Array.isArray(db.locations)?db.locations:[];db.deletedLocations=Array.isArray(db.deletedLocations)?db.deletedLocations:[];db.monthlyAttendance=db.monthlyAttendance||[];db.memos=db.memos||[];syncLocationMaster();localStorage.setItem(KEY,JSON.stringify(db));refresh();setCloudStatus('Cloud data loaded successfully.',true);if(!silent)alert('Cloud data loaded successfully.');return true}catch(e){setCloudStatus('Download failed: '+e.message,false);if(!silent)alert('Cloud download failed.\n\n'+e.message);return false}finally{cloudLoading=false}}
-async function uploadCloud(){if(!cloudConfigured()){alert('First configure Cloud Sync.');return false}try{cloudSaving=true;syncLocationMaster();await cloudRequest('POST',{key:'main',data:db,updated_at:new Date().toISOString()});setCloudStatus('Cloud updated successfully.',true);alert('This device data has been uploaded to the shared cloud database.');return true}catch(e){setCloudStatus('Upload failed: '+e.message,false);alert('Cloud upload failed.\n\n'+e.message);return false}finally{cloudSaving=false}}
-function queueCloudSave(){if(!cloudConfigured()||cloudLoading||cloudSaving)return;clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(async()=>{try{await cloudRequest('POST',{key:'main',data:db,updated_at:new Date().toISOString()});setCloudStatus('Saved to cloud.',true)}catch(e){setCloudStatus('Cloud save failed: '+e.message,false)}},700)}
-function persist(){syncLocationMaster();localStorage.setItem(KEY,JSON.stringify(db));refresh();queueCloudSave()}
-function copyCloudShareLink(){if(!cloudConfigured())return alert('First configure and connect Cloud Sync.');const u=new URL(location.href);u.searchParams.set('cloud_url',getCloudConfig().url);u.searchParams.set('cloud_key',getCloudConfig().key);navigator.clipboard.writeText(u.toString()).then(()=>alert('Share Link copied. Send this same link to your other mobile.')).catch(()=>prompt('Copy this Share Link:',u.toString()))}
-function initCloudFromLink(){try{const u=new URL(location.href);const cu=u.searchParams.get('cloud_url'),ck=u.searchParams.get('cloud_key');if(cu&&ck){setCloudConfig({url:cu,key:ck});downloadCloud(true)}}catch(e){}}
+// db is initialized by Auth/cloud after login.
 db.locations=Array.isArray(db.locations)?db.locations:[];
-db.deletedLocations=Array.isArray(db.deletedLocations)?db.deletedLocations:[];
 db.monthlyAttendance=db.monthlyAttendance||[];
 if(!db.memos) db.memos=[];
 db.employees.forEach(e=>{ if(!Array.isArray(e.locationHistory)){ e.locationHistory=e.location?[{location:e.location,from:e.join||'',to:''}]:[]; } });
 function syncLocationMaster(){
-  const deleted=new Set((db.deletedLocations||[]).map(x=>String(x).trim().toLowerCase()).filter(Boolean));
-  const names=new Set((db.locations||[]).map(x=>String(x).trim()).filter(x=>x && !deleted.has(x.toLowerCase())));
-  db.employees.forEach(e=>{ if(e.location){ const z=String(e.location).trim(); if(!deleted.has(z.toLowerCase())) names.add(z); } (e.locationHistory||[]).forEach(h=>{if(h.location){ const z=String(h.location).trim(); if(!deleted.has(z.toLowerCase())) names.add(z); }}); });
-  ['monthlyAttendance','leave','salary','memos','attendance'].forEach(k=>(db[k]||[]).forEach(r=>{if(r.location){ const z=String(r.location).trim(); if(!deleted.has(z.toLowerCase())) names.add(z); }}));
+  const names=new Set((db.locations||[]).map(x=>String(x).trim()).filter(Boolean));
+  db.employees.forEach(e=>{ if(e.location) names.add(String(e.location).trim()); (e.locationHistory||[]).forEach(h=>{if(h.location)names.add(String(h.location).trim())}); });
+  ['monthlyAttendance','leave','salary','memos','attendance'].forEach(k=>(db[k]||[]).forEach(r=>{if(r.location)names.add(String(r.location).trim())}));
   db.locations=[...names].sort((a,b)=>a.localeCompare(b));
 }
 syncLocationMaster();
 function repairMonthlyAndSalary(){ const ma=new Map(); (db.monthlyAttendance||[]).forEach(r=>{if(r&&r.month&&r.id)ma.set(String(r.month)+'|'+employeeKey(r.id),r);}); db.monthlyAttendance=[...ma.values()]; const sal=new Map(); (db.salary||[]).forEach(r=>{if(r&&r.month&&r.id)sal.set(String(r.month)+'|'+employeeKey(r.id),r);}); db.salary=[...sal.values()]; } repairMonthlyAndSalary();
-function persist(){syncLocationMaster();localStorage.setItem(KEY,JSON.stringify(db));refresh();}
+function persist(){syncLocationMaster();sessionSave();refresh();queueCloudSync();}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 function populateMonthSelectors(){
-  const ids=['attMonth','sMonth','slipMonth','locationDetailMonth'];
+  const ids=['attMonth','sMonth','slipMonth'];
   const now=new Date(), current=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
   ids.forEach(id=>{
     const el=document.getElementById(id); if(!el)return;
@@ -303,7 +359,7 @@ function populateMonthSelectors(){
 }
 
 function updateMonthLabels(){
-  const pairs=[['attMonth','attMonthText'],['sMonth','sMonthText'],['slipMonth','slipMonthText'],['locationDetailMonth','locationDetailMonthText']];
+  const pairs=[['attMonth','attMonthText'],['sMonth','sMonthText'],['slipMonth','slipMonthText']];
   pairs.forEach(([a,b])=>{const x=document.getElementById(a),t=document.getElementById(b);if(x&&t)t.textContent=formatMonthEn(x.value);});
 }
 
@@ -324,9 +380,7 @@ document.getElementById('dLeave').textContent=db.leave.length;
 ['lEmp','sEmp','slipEmp','mEmp','profileEmp'].forEach(fillSelect);
 renderEmployees();renderLeave();renderSalary();renderMemos();renderReports();renderLocations();populateLocationOptions(); populateMonthSelectors(); updateMonthLabels(); updateSalaryAttendanceSummary(); if(document.getElementById('lEmp')) updateLeaveLocation();
 }
-function clearEmployee(){document.getElementById('editIndex').value=-1;document.getElementById('editOriginalId').value='';document.querySelectorAll('#employees input').forEach(i=>{if(i.id!=='eId'&&i.type!=='file')i.value=''});document.getElementById('eId').value=nextId();document.getElementById('eGender').value='Male';document.getElementById('eStatus').value='Active';document.getElementById('eLocationDate').value=new Date().toISOString().slice(0,10);clearEmployeePhoto();}
-function previewEmployeePhoto(input){const file=input&&input.files&&input.files[0];if(!file)return; if(!file.type.startsWith('image/'))return alert('Please select an image file.'); const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{const max=600;let w=img.width,h=img.height;const scale=Math.min(1,max/Math.max(w,h));w=Math.max(1,Math.round(w*scale));h=Math.max(1,Math.round(h*scale));const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);const data=c.toDataURL('image/jpeg',0.78);document.getElementById('ePhotoData').value=data;document.getElementById('ePhotoPreview').src=data;};img.src=reader.result;};reader.readAsDataURL(file);}
-function clearEmployeePhoto(){const d=document.getElementById('ePhotoData'),f=document.getElementById('ePhoto'),p=document.getElementById('ePhotoPreview');if(d)d.value='';if(f)f.value='';if(p)p.src='';}
+function clearEmployee(){document.getElementById('editIndex').value=-1;document.getElementById('editOriginalId').value='';document.querySelectorAll('#employees input').forEach(i=>{if(i.id!=='eId')i.value=''});document.getElementById('eId').value=nextId();document.getElementById('eGender').value='Male';document.getElementById('eStatus').value='Active';document.getElementById('eLocationDate').value=new Date().toISOString().slice(0,10);}
 function saveEmployee(){
   const name=document.getElementById('eName').value.trim();
   if(!name)return alert('Full Name is required.');
@@ -350,9 +404,7 @@ function saveEmployee(){
   }
 
   const newLocation=val('eLocation').trim();
-  if(newLocation && db.deletedLocations) db.deletedLocations=db.deletedLocations.filter(x=>String(x).trim().toLowerCase()!==newLocation.toLowerCase());
-  const data={id,name,visa:val('eVisa'),division:val('eDivision'),designation:val('eDesignation'),department:val('eDepartment'),category:val('eCategory'),employeeType:val('eType'),grade:val('eGrade'),nationality:val('eNationality'),gender:val('eGender'),dob:val('eDob'),join:val('eJoin'),location:newLocation,status:val('eStatus'),phone:val('ePhone'),email:val('eEmail'),photo:document.getElementById('ePhotoData')?.value||''};
-  if(existingIdx>=0 && !data.photo) data.photo=db.employees[existingIdx].photo||'';
+  const data={id,name,visa:val('eVisa'),division:val('eDivision'),designation:val('eDesignation'),department:val('eDepartment'),category:val('eCategory'),grade:val('eGrade'),nationality:val('eNationality'),gender:val('eGender'),dob:val('eDob'),join:val('eJoin'),location:newLocation,status:val('eStatus'),phone:val('ePhone'),email:val('eEmail')};
 
   if(existingIdx<0){
     data.locationHistory=newLocation?[{location:newLocation,from:val('eJoin')||new Date().toISOString().slice(0,10),to:''}]:[];
@@ -379,7 +431,7 @@ function saveEmployee(){
   alert('Employee saved successfully. Total Employees: '+db.employees.length+'\nExisting employees are preserved.');
 }
 function val(id){return document.getElementById(id).value}
-function editEmployee(i){let e=db.employees[i];if(!e)return;document.getElementById('editIndex').value=i;document.getElementById('editOriginalId').value=e.id||'';for(let [id,k] of [['eId','id'],['eName','name'],['eVisa','visa'],['eDivision','division'],['eDesignation','designation'],['eDepartment','department'],['eCategory','category'],['eType','employeeType'],['eGrade','grade'],['eNationality','nationality'],['eGender','gender'],['eDob','dob'],['eJoin','join'],['eLocation','location'],['eLocationDate',''],['eStatus','status'],['ePhone','phone'],['eEmail','email']])document.getElementById(id).value=e[k]||'';document.getElementById('eLocationDate').value=new Date().toISOString().slice(0,10);document.getElementById('ePhotoData').value=e.photo||'';document.getElementById('ePhotoPreview').src=e.photo||'';document.getElementById('ePhoto').value='';window.scrollTo(0,0)}
+function editEmployee(i){let e=db.employees[i];if(!e)return;document.getElementById('editIndex').value=i;document.getElementById('editOriginalId').value=e.id||'';for(let [id,k] of [['eId','id'],['eName','name'],['eVisa','visa'],['eDivision','division'],['eDesignation','designation'],['eDepartment','department'],['eCategory','category'],['eGrade','grade'],['eNationality','nationality'],['eGender','gender'],['eDob','dob'],['eJoin','join'],['eLocation','location'],['eLocationDate',''],['eStatus','status'],['ePhone','phone'],['eEmail','email']])document.getElementById(id).value=e[k]||'';document.getElementById('eLocationDate').value=new Date().toISOString().slice(0,10);window.scrollTo(0,0)}
 function changeEmployeeLocation(i){
   const e=db.employees[i];
   if(!e)return;
@@ -411,8 +463,8 @@ function addLocationMaster(){
   if(!name)return alert('Please enter a location name.');
   syncLocationMaster();
   if(db.locations.some(x=>x.toLowerCase()===name.toLowerCase()))return alert('This location already exists.');
-  db.deletedLocations=(db.deletedLocations||[]).filter(x=>x.toLowerCase()!==name.toLowerCase());
   db.locations.push(name); db.locations.sort((a,b)=>a.localeCompare(b));
+  localStorage.setItem(KEY,JSON.stringify(db));
   document.getElementById('newLocationName').value='';
   refresh();
   alert('Location added successfully.');
@@ -423,50 +475,9 @@ function renderLocations(){
   const locs=db.locations||[];
   t.innerHTML=locs.map((loc,i)=>{
     const emps=db.employees.filter(e=>(e.location||'').trim().toLowerCase()===loc.toLowerCase());
-    return `<tr><td><b>${esc(loc)}</b></td><td>${emps.length}</td><td>${emps.map(e=>esc(e.id)).join('<br>')||'<span class="muted">No current employee</span>'}</td><td>${emps.map(e=>esc(e.name)).join('<br>')||'<span class="muted">-</span>'}</td><td><button class="btn" onclick="selectLocationDetail('${esc(loc).replace(/'/g,"\'")}')">View All Details</button><button class="btn red" onclick="deleteLocationMaster('${esc(loc).replace(/'/g,"\'")}')">Delete</button></td></tr>`;
+    return `<tr><td><b>${esc(loc)}</b></td><td>${emps.length}</td><td>${emps.map(e=>esc(e.id)).join('<br>')||'<span class="muted">No current employee</span>'}</td><td>${emps.map(e=>esc(e.name)).join('<br>')||'<span class="muted">-</span>'}</td><td><button class="btn" onclick="showLocationEmployees('${esc(loc).replace(/'/g,"\'")}')">View Employees</button></td></tr>`;
   }).join('')||'<tr><td colspan="5">No locations found. Add a location or add an employee with a location.</td></tr>';
-  populateLocationDetailSelect();
   renderLocationSalaryDetails();
-  renderLocationOverview();
-}
-function deleteLocationMaster(loc){
-  const name=String(loc||'').trim();
-  if(!name)return;
-  const emps=db.employees.filter(e=>(e.location||'').trim().toLowerCase()===name.toLowerCase());
-  if(emps.length){
-    return alert('This location cannot be deleted because '+emps.length+' current employee(s) are assigned to it. Change their location first.');
-  }
-  if(!confirm('Delete location option \"'+name+'\"? Historical attendance, leave, salary and memo records will NOT be deleted.'))return;
-  db.locations=(db.locations||[]).filter(x=>String(x).trim().toLowerCase()!==name.toLowerCase());
-  if(!db.deletedLocations)db.deletedLocations=[];
-  if(!db.deletedLocations.some(x=>String(x).trim().toLowerCase()===name.toLowerCase()))db.deletedLocations.push(name);
-  const sel=document.getElementById('locationDetailSelect'); if(sel&&sel.value.toLowerCase()===name.toLowerCase())sel.value='';
-  persist();
-  alert('Location deleted from the Location options. Historical records are preserved.');
-}
-function populateLocationDetailSelect(){
-  const sel=document.getElementById('locationDetailSelect'); if(!sel)return;
-  const current=sel.value; const locs=db.locations||[];
-  sel.innerHTML='<option value="">Select Location</option>'+locs.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
-  if(current&&locs.some(x=>x.toLowerCase()===current.toLowerCase())) sel.value=current;
-  else if(locs.length===1) sel.value=locs[0];
-}
-function selectLocationDetail(loc){const sel=document.getElementById('locationDetailSelect');if(sel){sel.value=loc;renderLocationOverview();}}
-function renderLocationOverview(){
-  const t=document.getElementById('locationOverviewTable'); if(!t)return;
-  const loc=(val('locationDetailSelect')||'').trim(); const month=val('locationDetailMonth');
-  const mt=document.getElementById('locationDetailMonthText'); if(mt)mt.textContent=month?formatMonthEn(month):'';
-  if(!loc){t.innerHTML='<tr><td colspan="13">Select a Location to see all employees and their details.</td></tr>';return;}
-  const emps=db.employees.filter(e=>(e.location||'').trim().toLowerCase()===loc.toLowerCase()).sort((a,b)=>String(a.id).localeCompare(String(b.id)));
-  t.innerHTML=emps.map(e=>{
-    const att=month?monthlyRecord(month,e.id):null;
-    const sal=month?salaryRecord(month,e.id):null;
-    const leaves=(db.leave||[]).filter(l=>employeeKey(l.id)===employeeKey(e.id)&&String(l.location||e.location).trim().toLowerCase()===loc.toLowerCase()).reduce((n,l)=>n+(+l.days||0),0);
-    const memos=(db.memos||[]).filter(m=>employeeKey(m.id)===employeeKey(e.id)&&String(m.location||e.location).trim().toLowerCase()===loc.toLowerCase()).length;
-    const allowances=sal?(+sal.housing||0)+(+sal.transport||0)+(+sal.other||0):0;
-    const incentives=sal?(+sal.vpower||0)+(+sal.fuel||0)+(+sal.filling||0)+(+sal.telephone||0):0;
-    return `<tr><td><b>${esc(e.id)}</b></td><td>${esc(e.name)}</td><td>${esc(e.department||'')}</td><td>${att?esc(att.present||0):'0'}</td><td>${att?esc(att.ot||0):'0'}</td><td>${leaves}</td><td>${sal?(+sal.basic||0).toFixed(2):'0.00'}</td><td>${allowances.toFixed(2)}</td><td>${incentives.toFixed(2)}</td><td>${sal?(+sal.ot||0).toFixed(2):'0.00'}</td><td>${sal?(+sal.ded||0).toFixed(2):'0.00'}</td><td><b>${sal?(+sal.net||0).toFixed(2):'0.00'}</b></td><td>${memos}</td></tr>`;
-  }).join('')||'<tr><td colspan="13">No current employees in this location.</td></tr>';
 }
 function renderLocationSalaryDetails(){
   const t=document.getElementById('locationSalaryTable'); if(!t)return;
@@ -483,14 +494,6 @@ function showLocationEmployees(loc){
   if(!emps.length)return alert(loc+' has no current employees.');
   alert(loc+'\n\n'+emps.map(e=>e.id+' - '+e.name).join('\n'));
 }
-function syncEmployeeTypeDesignation(){const t=val('eType');const d=document.getElementById('eDesignation');if(!d)return;if(t==='In-Charge')d.value='In-Charge';else if(t==='Filler' && (!d.value || /^(in-?charge|filler)$/i.test(d.value)))d.value='Filler';}
-function renderEmployeeTypePage(type){
-  const body=document.getElementById(type==='In-Charge'?'inchargeBody':'fillerBody');
-  if(!body)return;
-  const rows=db.employees.map((e,i)=>({e,i})).filter(x=>{const t=String(x.e.employeeType||'').trim().toLowerCase(); const d=String(x.e.designation||'').trim().toLowerCase(); if(type==='In-Charge') return t==='in-charge'||t==='incharge'||d==='in-charge'||d==='incharge'; if(type==='Filler') return t==='filler'||d==='filler'||d.includes('filler'); return false;});
-  body.innerHTML=rows.map(({e,i})=>`<tr><td>${esc(e.id)}</td><td>${esc(e.name)}</td><td>${esc(e.designation||'')}</td><td>${esc(e.department||'')}</td><td>${esc(e.location||'')}</td><td>${esc(e.status||'')}</td><td><button class="btn" onclick="editEmployee(${i});show('employees')">Edit</button></td></tr>`).join('') || `<tr><td colspan="7">No ${type} employees found.</td></tr>`;
-}
-
 function renderEmployees(){let t=document.getElementById('empTable');if(!t)return;t.innerHTML=db.employees.map((e,i)=>`<tr><td>${esc(e.id)}</td><td>${esc(e.name)}</td><td>${esc(e.visa)}</td><td>${esc(e.designation)}</td><td>${esc(e.department)}</td><td>${esc(e.location||'')}</td><td>${esc(e.status)}</td><td><button class="btn" onclick="editEmployee(${i})">Edit</button><button class="btn" onclick="changeEmployeeLocation(${i})">Change Location</button><button class="btn red" onclick="del(db.employees,${i})">Delete</button></td></tr>`).join('')}
 function formatMonthEn(m){
   if(!m)return '';
@@ -653,10 +656,6 @@ function loadEmployeeProfile(){
   box.innerHTML=`
   <div class="card">
     <h3>👤 Personal / Employee Details</h3>
-    <div style="display:flex;align-items:flex-start;gap:18px;margin-bottom:14px">
-      ${e.photo?`<img class="profile-photo" src="${e.photo}" alt="Employee Photo" onclick="openMemoImage(this.src)" title="Click to view full size">`:'<div class="profile-photo" style="display:flex;align-items:center;justify-content:center;color:#667">No Photo</div>'}
-      <div><b>Employee Photo</b><br><span class="muted">Click the photo to view full size.</span></div>
-    </div>
     <div class="grid">
       <div><b>Employee ID</b><br>${esc(e.id)}</div>
       <div><b>Name</b><br>${esc(e.name)}</div>
@@ -721,20 +720,10 @@ function loadEmployeeProfile(){
 
 function renderReports(){let c=document.getElementById('reportContent');if(!c)return;let by={};db.salary.forEach(s=>by[s.month]=(by[s.month]||0)+(+s.net||0));let leaveDays=db.leave.reduce((x,l)=>x+(+l.days||0),0);c.innerHTML=`<h3>Summary</h3><table><tr><th>Metric</th><th>Value</th></tr><tr><td>Total Employees</td><td>${db.employees.length}</td></tr><tr><td>Active Employees</td><td>${db.employees.filter(e=>e.status==='Active').length}</td></tr><tr><td>Total Attendance Records</td><td>${db.attendance.length}</td></tr><tr><td>Total Leave Records</td><td>${db.leave.length}</td></tr><tr><td>Total Leave Days</td><td>${leaveDays}</td></tr></table><h3>Payroll by Month</h3><table><tr><th>Month</th><th>Net Payroll</th></tr>${Object.entries(by).map(([m,v])=>`<tr><td>${formatMonthEn(m)}</td><td>${v.toFixed(2)}</td></tr>`).join('')}</table>`}
 function backup(){let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='HR_Backup.json';a.click();URL.revokeObjectURL(a.href)}
-function restore(ev){let f=ev.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x.employees||!x.attendance||!x.leave||!x.salary)throw 0;if(!x.memos)x.memos=[];if(!x.monthlyAttendance)x.monthlyAttendance=[];if(!x.locations)x.locations=[];if(!x.deletedLocations)x.deletedLocations=[];db=x;syncLocationMaster();persist();alert('Data restored successfully.')}catch(e){alert('Invalid backup file.')}};r.readAsText(f)}
+function restore(ev){let f=ev.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x.employees||!x.attendance||!x.leave||!x.salary)throw 0;if(!x.memos)x.memos=[];if(!x.monthlyAttendance)x.monthlyAttendance=[];if(!x.locations)x.locations=[];db=x;syncLocationMaster();persist();alert('Data restored successfully.')}catch(e){alert('Invalid backup file.')}};r.readAsText(f)}
 setInterval(()=>document.getElementById('clock').textContent=new Date().toLocaleString(),1000);
-document.getElementById('aDate').value=new Date().toISOString().slice(0,10);
-populateMonthSelectors();
-updateMonthLabels();
-refresh();clearEmployee();clearMemo();
-initCloudFromLink();
-</script>
-
-<script>
-if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
-let deferredInstallPrompt=null;
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;});
-async function installHRApp(){if(deferredInstallPrompt){deferredInstallPrompt.prompt();try{await deferredInstallPrompt.userChoice;}catch(e){}deferredInstallPrompt=null;}else{alert('Chrome menu (⋮) থেকে “Add to Home screen” বা “Install app” নির্বাচন করুন।');}}
+// Auth starts the application after login and cloud load.
+initAuth();
 </script>
 </body>
 </html>
